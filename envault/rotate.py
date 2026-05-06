@@ -36,11 +36,20 @@ def rotate(
     -------
     Path
         The path to the rotated vault file (same as *vault_path*).
+
+    Raises
+    ------
+    RotationError
+        If the vault file does not exist, the old passphrase is incorrect, or
+        the new passphrase is identical to the old one.
     """
     vault_path = Path(vault_path)
 
     if not vault_path.exists():
         raise RotationError(f"Vault file not found: {vault_path}")
+
+    if old_passphrase == new_passphrase:
+        raise RotationError("New passphrase must differ from the old passphrase.")
 
     blob = vault_path.read_bytes()
 
