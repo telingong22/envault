@@ -47,12 +47,20 @@ def remove_cmd(vault: str, group: str, keys: tuple) -> None:
 
 @group_cmd.command("list")
 @click.argument("vault")
-def list_cmd(vault: str) -> None:
-    """List all groups and their keys for VAULT."""
+@click.option("--group", "-g", default=None, help="Show only this group.")
+def list_cmd(vault: str, group: str | None) -> None:
+    """List all groups and their keys for VAULT.
+
+    Optionally filter output to a single GROUP with --group / -g.
+    """
     groups = list_groups(vault)
     if not groups:
         click.echo("No groups defined.")
         return
+    if group is not None:
+        if group not in groups:
+            raise click.ClickException(f"Group '{group}' not found in vault '{vault}'.")
+        groups = {group: groups[group]}
     for name, keys in sorted(groups.items()):
         click.echo(f"{name}: {', '.join(keys)}")
 
