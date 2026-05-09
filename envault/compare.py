@@ -58,6 +58,10 @@ def _unlock_vault(vault_path: Path, passphrase: str) -> Dict[str, str]:
         v = Vault(tmp_path, vault_path)
         v.unlock(passphrase)
         return parse_env(tmp_path)
+    except Exception as exc:
+        raise CompareError(
+            f"Failed to unlock vault '{vault_path}': {exc}"
+        ) from exc
     finally:
         if tmp_path.exists():
             tmp_path.unlink()
